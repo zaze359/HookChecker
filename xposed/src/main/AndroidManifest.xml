@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zaze.hook.xposed">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application>
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="Easy example which makes the status bar clock red and adds a smiley" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="53" />
+
+        <activity android:name=".devices.DeviceHookActivity" />
+
+        <provider
+            android:name=".data.HookProvider"
+            android:authorities="com.zaze.hook.xposed.provider"
+            android:exported="true"
+            android:writePermission="${applicationId}" />
+
+    </application>
+</manifest>

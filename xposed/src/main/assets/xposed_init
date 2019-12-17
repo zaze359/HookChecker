@@ -1,0 +1,2 @@
+com.zaze.hook.xposed.XposedTest
+com.zaze.hook.xposed.devices.DeviceInfoHooker

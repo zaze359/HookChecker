@@ -1,0 +1,2 @@
+include ':app', ':checker', ':xposed'
+rootProject.name='HookChecker'
