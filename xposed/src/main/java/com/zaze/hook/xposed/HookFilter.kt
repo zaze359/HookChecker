@@ -1,6 +1,7 @@
 package com.zaze.hook.xposed
 
 import android.content.pm.ApplicationInfo
+import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
@@ -10,9 +11,11 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  */
 object HookFilter {
 
+    val pkgSet = setOf("android", "com.topjohnwu.magisk", "de.robv.android.xposed.installer")
+
     fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam): Boolean {
-        if (lpparam.packageName == "android" || lpparam.packageName == "de.robv.android.xposed.installer") {
-            // 过滤 部分应用
+        if (pkgSet.contains(lpparam.packageName)) {
+            XposedBridge.log("过滤重要应用不hook: ${lpparam.packageName}")
             return true
         }
         if (lpparam.appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0) {
