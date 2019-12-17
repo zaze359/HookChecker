@@ -37,7 +37,7 @@ object XposedSharedPreferencesHelper {
                 null,
                 null
             )
-            if (cursor != null) {
+            if (cursor != null && cursor.moveToNext()) {
                 return Utils.parseJson(
                     cursor.getString(cursor.getColumnIndex("deviceInfo")),
                     DeviceInfo::class.java

@@ -10,24 +10,14 @@ import de.robv.android.xposed.XposedHelpers
  * @author : ZAZE
  * @version : 2019-12-17 - 14:40
  */
-class ContextHook {
-    private lateinit var context: Context
+class ApplicationHook {
 
-    init {
+    fun getApplication(methodHook: XC_MethodHook) {
         XposedHelpers.findAndHookMethod(
             Application::class.java,
             "attach",
             Context::class.java,
-            object : XC_MethodHook() {
-                override fun beforeHookedMethod(param: MethodHookParam) {
-                    context = param.args[0] as Context
-                }
-            })
-
-    }
-
-
-    fun getContext(): Context {
-        return context
+            methodHook
+        )
     }
 }

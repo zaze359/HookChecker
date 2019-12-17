@@ -35,10 +35,8 @@ class HookProvider : ContentProvider() {
             if (map == null || map.isEmpty()) {
                 return null
             }
-            val cursor = MatrixCursor(arrayOf("key", "value"))
-            map.forEach { entry ->
-                cursor.addRow(arrayOf(entry.key, entry.value.toString()))
-            }
+            val cursor = MatrixCursor(map.keys.toTypedArray())
+            cursor.addRow(map.values.toTypedArray())
             return cursor
         }
         return null
