@@ -28,7 +28,7 @@ class DeviceInfoHooker : IXposedHookLoadPackage {
         }
         val hookCore = HookCore(lpparam)
 
-        hookCore.Application.getApplication(object : XC_MethodHook() {
+        hookCore.Application.getContext(object : XC_MethodHook() {
             override fun afterHookedMethod(param: MethodHookParam) {
                 XposedBridge.log("$TAG application : ${param.thisObject}")
                 val context = param.args[0] as Context

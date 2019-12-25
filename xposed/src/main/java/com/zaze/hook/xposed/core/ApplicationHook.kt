@@ -1,4 +1,4 @@
-package com.zaze.hook.xposed.core.method
+package com.zaze.hook.xposed.core
 
 import android.app.Application
 import android.content.Context
@@ -10,9 +10,9 @@ import de.robv.android.xposed.XposedHelpers
  * @author : ZAZE
  * @version : 2019-12-17 - 14:40
  */
-class ApplicationHook {
+class ApplicationHook internal constructor() {
 
-    fun getApplication(methodHook: XC_MethodHook) {
+    fun getContext(methodHook: XC_MethodHook) {
         XposedHelpers.findAndHookMethod(
             Application::class.java,
             "attach",

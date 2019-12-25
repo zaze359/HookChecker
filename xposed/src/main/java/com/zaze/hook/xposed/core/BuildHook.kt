@@ -1,7 +1,6 @@
-package com.zaze.hook.xposed.core.method
+package com.zaze.hook.xposed.core
 
 import android.os.Build
-import com.zaze.hook.xposed.core.XC_ResultHook
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
@@ -12,7 +11,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  * @author : ZAZE
  * @version : 2019-12-16 - 15:12
  */
-class BuildHook(lpparam: XC_LoadPackage.LoadPackageParam) {
+class BuildHook internal constructor(lpparam: XC_LoadPackage.LoadPackageParam) {
     private val buildMap = HashMap<String, String>()
 
     companion object {

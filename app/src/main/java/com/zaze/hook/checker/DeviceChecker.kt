@@ -1,6 +1,8 @@
 package com.zaze.hook.checker
 
 import android.content.Context
+import com.zaze.common.thread.ThreadPlugins
+import com.zaze.hook.checker.log.CheckerLog
 
 /**
  * Description :
@@ -9,12 +11,28 @@ import android.content.Context
  */
 object DeviceChecker {
 
+    private const val TAG = "DeviceChecker"
+
     /**
      * 检测安全
      */
     fun detectSafely(context: Context) {
-        QemuChecker.detectEmulatorByProp(context)
-        DebuggerChecker.detectDebugger(context)
+        var hasXposed = XposedChecker.detectByStackTrace()
+        ThreadPlugins.runInIoThread(Runnable {
+            val isEmulator = QemuChecker.detectEmulatorByProp(context)
+            if (!hasXposed) {
+                hasXposed = XposedChecker.detectByClassLoader() or XposedChecker.detectByMaps()
+            }
+            val isRoot = RootChecker.detectRoot()
+//            if (isEmulator) {
+//                CheckerLog.e(TAG, "程序运行在模拟器中!")
+//            } else {
+//                CheckerLog.i(TAG, "程序运行在真实设备中!")
+//            }
+            CheckerLog.log(TAG, "isEmulator : $isEmulator", isEmulator)
+            CheckerLog.log(TAG, "isRoot : $isRoot", isRoot)
+            CheckerLog.log(TAG, "hasXposed : $hasXposed", hasXposed)
+        })
     }
 
 //    public static boolean CheckRootPathSU()

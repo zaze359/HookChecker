@@ -1,4 +1,4 @@
-package com.zaze.hook.xposed.core.method
+package com.zaze.hook.xposed.core
 
 import android.provider.Settings
 import de.robv.android.xposed.XC_MethodHook
@@ -10,7 +10,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  * @author : ZAZE
  * @version : 2019-12-16 - 15:12
  */
-class SettingsHook(lpparam: XC_LoadPackage.LoadPackageParam) {
+class SettingsHook internal constructor(lpparam: XC_LoadPackage.LoadPackageParam) {
     companion object {
         const val TAG = "Settings"
     }
@@ -27,7 +27,8 @@ class SettingsHook(lpparam: XC_LoadPackage.LoadPackageParam) {
         }
 
         init {
-            XposedBridge.hookAllMethods(clazz, "getString",
+            XposedBridge.hookAllMethods(
+                clazz, "getString",
                 object : XC_MethodHook() {
                     override fun afterHookedMethod(param: MethodHookParam?) {
                         if (param?.args == null || param.args.size <= 1) {

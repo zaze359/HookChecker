@@ -2,15 +2,14 @@ package com.zaze.hook.checker
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
-import android.widget.Toast
+import com.zaze.hook.checker.log.CheckerLog
 
 /**
- * Description :
+ * Description : 检测模拟器
  * @author : ZAZE
  * @version : 2019-12-02 - 18:54
  */
-internal object QemuChecker {
+object QemuChecker {
     private const val TAG = "QemuChecker"
 
 //    val pattern = Pattern.compile("[.*]:[.*]\n")
@@ -30,23 +29,14 @@ internal object QemuChecker {
         } ?: true
         // x86架构在真机中极少，后续若出现单独适配
         val isX86 = propMap["ro.product.cpu.abi"] == "x86"
-        Log.e(TAG, "isQemuKernel : $isQemuKernel")
-        Log.e(TAG, "isDebugTags : $isDebugTags")
-        Log.e(TAG, "isX86 : $isX86")
-        Log.e(TAG, "isQemuModel : $isQemuModel")
-        Log.e(TAG, "checkFingerprintMatched : ${checkFingerprintMatched(propMap)}")
-        return if (isX86 || isQemuKernel || isDebugTags || isQemuModel || !checkFingerprintMatched(
-                propMap
-            )
-        ) {
-            Log.e(TAG, "程序运行在模拟器中!")
-            Toast.makeText(context, "程序运行在模拟器中!", Toast.LENGTH_SHORT).show()
-            true
-        } else {
-            Log.i(TAG, "程序运行在真实设备中!")
-            Toast.makeText(context, "程序运行在真实设备中!", Toast.LENGTH_SHORT).show()
-            false
-        }
+        CheckerLog.e(TAG, "isQemuKernel : $isQemuKernel")
+        CheckerLog.e(TAG, "isDebugTags : $isDebugTags")
+        CheckerLog.e(TAG, "isX86 : $isX86")
+        CheckerLog.e(TAG, "isQemuModel : $isQemuModel")
+        CheckerLog.e(TAG, "checkFingerprintMatched : ${checkFingerprintMatched(propMap)}")
+        return isX86 || isQemuKernel || isDebugTags || isQemuModel || !checkFingerprintMatched(
+            propMap
+        )
     }
 
     /**
@@ -60,8 +50,8 @@ internal object QemuChecker {
      * getString("ro.build.tags");
      */
     private fun checkFingerprintMatched(propMap: HashMap<String, String>): Boolean {
-        Log.d(TAG, "Build.FINGERPRINT : ${Build.FINGERPRINT}")
-        Log.d(TAG, "ro.build.fingerprint : ${propMap["ro.build.fingerprint"]}")
+        CheckerLog.d(TAG, "Build.FINGERPRINT : ${Build.FINGERPRINT}")
+        CheckerLog.d(TAG, "ro.build.fingerprint : ${propMap["ro.build.fingerprint"]}")
         return propMap["ro.build.fingerprint"]?.split("/")?.let {
             it.contains(propMap["ro.product.brand"] ?: "")
                     && it.contains(propMap["ro.product.name"] ?: "")
@@ -83,12 +73,12 @@ internal object QemuChecker {
 
     private fun getAllProp(): HashMap<String, String> {
         val propMap = HashMap<String, String>()
-        ExecUtil.exec("getprop").toString()
-            .replace("[", "")
-            .replace("]", "")
-            .split("\n").forEach {
+        ExecUtil.exec(arrayOf("getprop"))?.toString()
+            ?.replace("[", "")
+            ?.replace("]", "")
+            ?.split("\n")?.forEach {
                 val kv = it.split(": ")
-                Log.d(TAG, "kv : $it")
+//                CheckerLog.d(TAG, "kv : $it")
                 if (kv.size >= 2) {
                     propMap[kv[0]] = kv[1]
                 }

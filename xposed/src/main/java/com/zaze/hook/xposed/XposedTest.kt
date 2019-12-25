@@ -25,6 +25,7 @@ class XposedTest : IXposedHookLoadPackage {
         if (HookFilter.handleLoadPackage(lpparam)) {
             return
         }
+//        HookCore(lpparam)
         if ("com.zaze.demo" == lpparam.packageName) {
             val testDebugClass = lpparam.classLoader.loadClass("com.zaze.demo.debug.TestDebug")
             XposedHelpers.findAndHookMethod(

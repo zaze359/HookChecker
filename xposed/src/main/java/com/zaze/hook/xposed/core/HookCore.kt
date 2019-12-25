@@ -1,9 +1,5 @@
 package com.zaze.hook.xposed.core
 
-import com.zaze.hook.xposed.core.method.ApplicationHook
-import com.zaze.hook.xposed.core.method.BuildHook
-import com.zaze.hook.xposed.core.method.SettingsHook
-import com.zaze.hook.xposed.core.method.TelephonyManagerHook
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
@@ -16,4 +12,5 @@ class HookCore(lpparam: XC_LoadPackage.LoadPackageParam) {
     val Settings = SettingsHook(lpparam)
     val Build = BuildHook(lpparam)
     val Application = ApplicationHook()
+    val StackTraceElement = StackTraceElementHook()
 }
