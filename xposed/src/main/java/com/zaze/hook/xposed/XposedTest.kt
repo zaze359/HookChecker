@@ -53,6 +53,35 @@ class XposedTest : IXposedHookLoadPackage {
                     param?.result = "Hooked ${param?.result}"
                 }
             })
+            XposedBridge.hookAllMethods(
+                ClassLoader::class.java,
+                "defineClass",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam?) {
+                        super.beforeHookedMethod(param)
+                        XposedBridge.log("$TAG >> beforeHookedMethod defineClass ${param?.thisObject} >> ${param?.result}")
+                    }
+                })
+
+            XposedBridge.hookAllMethods(
+                ClassLoader::class.java,
+                "loadClass",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam?) {
+                        super.beforeHookedMethod(param)
+                        XposedBridge.log("$TAG >> beforeHookedMethod loadClass ${param?.thisObject} >> ${param?.result}")
+                    }
+                })
+            XposedBridge.hookAllMethods(
+                Class::class.java,
+                "forName",
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam?) {
+                        super.beforeHookedMethod(param)
+                        XposedBridge.log("$TAG >> beforeHookedMethod classForName ${param?.thisObject} >> ${param?.result}")
+                    }
+                })
+
         }
     }
 }
