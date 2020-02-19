@@ -1,6 +1,5 @@
 package com.zaze.hook.checker
 
-import android.text.TextUtils
 import java.io.File
 
 /**
@@ -8,17 +7,29 @@ import java.io.File
  * @author : ZAZE
  * @version : 2019-12-19 - 13:46
  */
-object RootChecker {
+class RootChecker {
 
-    fun detectRoot(): Boolean {
-        return detectByFile() || detectByCmd()
+    companion object {
+        const val TAG = "RootChecker"
     }
 
-    private fun detectByCmd(): Boolean {
-        return !TextUtils.isEmpty(ExecUtil.exec(arrayOf("su", "/system/xbin/which")).toString())
+    val result = CheckResult()
+
+    fun detectRoot() {
+        detectByFile()
+        detectByCmd()
     }
 
-    private fun detectByFile(): Boolean {
+    private fun detectByCmd() {
+        val cmdResult = ExecUtil.exec(arrayOf("su"))
+        if (cmdResult.first == ExecUtil.SUCCESS) {
+            result.addError("$TAG hit detectByCmd: su ${cmdResult.second} ")
+
+        }
+//        return !TextUtils.isEmpty().toString())
+    }
+
+    private fun detectByFile() {
         arrayOf(
             "/system/bin/",
             "/system/xbin/",
@@ -27,11 +38,8 @@ object RootChecker {
             "/vendor/bin/"
         ).forEach {
             if (File("${it}su").exists()) {
-                return true
+                result.addError("$TAG hit detectByFile: ${it}su")
             }
         }
-        return false
     }
-
-
 }

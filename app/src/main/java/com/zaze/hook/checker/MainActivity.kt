@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import androidx.appcompat.app.AppCompatActivity
+import com.zaze.common.thread.ThreadPlugins
 import com.zaze.hook.xposed.devices.DeviceHookActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -16,7 +17,9 @@ class MainActivity : AppCompatActivity() {
         App.getInstance().getMdmLogClient().bind(debugLogContent)
 
         checkDeviceBtn.setOnClickListener {
-            DeviceChecker.detectSafely(this)
+            ThreadPlugins.runInUIThread(Runnable {
+                DeviceChecker.detectSafely(this)
+            }, 0)
         }
         changedDeviceInfo.setOnClickListener {
             startActivity(Intent(this, DeviceHookActivity::class.java))

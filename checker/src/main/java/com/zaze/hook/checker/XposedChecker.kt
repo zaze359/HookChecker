@@ -9,32 +9,36 @@ import java.io.FileInputStream
  * @author : ZAZE
  * @version : 2019-12-13 - 15:02
  */
-object XposedChecker {
-    const val TAG = "XposedChecker"
+class XposedChecker {
+    companion object {
+        const val TAG = "XposedChecker"
+    }
+
+    val result = CheckResult()
+
     /**
      * 检测能否构建XposedHelpers类
      * 正常设备应该抛出ClassNotFoundException
      */
-    fun detectByClassLoader(): Boolean {
-        return try {
-            ClassLoader.getSystemClassLoader().loadClass("de.robv.android.xposed.XposedHelpers")
+    fun detectByClassLoader() {
+        try {
+            ClassLoader.getSystemClassLoader()
+                .loadClass("de.robv.android.xposed.XposedHelpers")
                 .newInstance() != null
         } catch (e: Exception) {
             CheckerLog.e(TAG, "detectByClassLoader flag ", e)
             if (e !is ClassNotFoundException) {
-                return true
+                result.addError("$TAG hit detectByClassLoader : $e")
             }
-            false
         }
     }
 
     /**
      * 1. 检测栈信息包含xposed包名
      * 2. 检测栈信息中ZygoteInit, 一般最底层栈为 com.android.internal.os.ZygoteInit.main
-     *
-     * @return true if had xposed framework
+     * 需要在主线中调用
      */
-    fun detectByStackTrace(): Boolean {
+    fun detectByStackTrace() {
         if (Thread.currentThread().id == Process.myPid().toLong()) {
             throw IllegalThreadStateException("必须在主线程调用")
         }
@@ -55,59 +59,31 @@ object XposedChecker {
             }
         }
         CheckerLog.e(TAG, "hasXposed flag : $flag; hasZygote: $hasZygote")
-        return flag > 0 || !hasZygote
+        if (flag > 0) {
+            result.addError("$TAG hit detectByStackTrace: 包含了xposed的栈信息")
+        }
+        if (!hasZygote) {
+            result.addError("$TAG hit detectByStackTrace: 没有Zygote栈信息")
+        }
     }
 
     /**
      * 去读maps检测是否加载类xposed 的so 和jar
      */
-    fun detectByMaps(): Boolean {
+    fun detectByMaps() {
         val hashSet = HashSet<String>()
         val buffer = CheckerUtil.readByBytes(FileInputStream("/proc/${Process.myPid()}/maps"))
         buffer.toString().split("\n").forEach { line ->
-            if ((line.endsWith(".so") || line.endsWith(".jar")) && line.contains(
-                    "xposed",
-                    true
-                )
+            if ((line.endsWith(".so") || line.endsWith(".jar"))
+                && line.contains("xposed", true)
             ) {
                 hashSet.add(line)
                 CheckerLog.d(TAG, "line $line")
             }
         }
+        if (hashSet.isNotEmpty()) {
+            result.addError("$TAG hit detectByMaps: 加载了 xposed 的so 和jar")
+        }
         CheckerLog.e(TAG, "has Xposed lib ${hashSet.size}")
-        return hashSet.isNotEmpty()
     }
-//    /**
-//     * 去读maps检测是否加载类xposed 的so 和jar
-//     */
-//    fun detectByMaps(): Boolean {
-//        var bufferedReader: BufferedReader? = null
-//        val hashSet = HashSet<String>()
-//        try {
-//            bufferedReader = BufferedReader(
-//                InputStreamReader(
-//                    FileInputStream("/proc/${Process.myPid()}/maps"),
-//                    "utf-8"
-//                )
-//            )
-//            var line = bufferedReader.readLine()
-//            while (line != null) {
-//                if ((line.endsWith(".so") || line.endsWith(".jar")) && line.contains(
-//                        "xposed",
-//                        true
-//                    )
-//                ) {
-//                    hashSet.add(line)
-//                    CheckerLog.d("XposedChecker line", line)
-//                }
-//                line = bufferedReader.readLine()
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        } finally {
-//            bufferedReader?.close()
-//        }
-//        CheckerLog.e(TAG, "has Xposed lib ${hashSet.size}")
-//        return hashSet.isNotEmpty()
-//    }
 }

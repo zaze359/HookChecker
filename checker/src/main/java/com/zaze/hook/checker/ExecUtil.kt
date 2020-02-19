@@ -11,12 +11,11 @@ import java.io.InputStreamReader
  * @version : 2019-12-03 - 14:14
  */
 object ExecUtil {
+    val SUCCESS = 0
 
-    fun exec(commands: Array<String>): StringBuilder? {
-        if (commands.isEmpty()) {
-            return null
-        }
-        var builder: StringBuilder? = null
+    fun exec(commands: Array<String>): Pair<Int, StringBuilder> {
+        var code = -1
+        val builder = StringBuilder()
         var process: Process? = null
         var os: DataOutputStream? = null
         try {
@@ -31,19 +30,17 @@ object ExecUtil {
             }
             os.writeBytes("exit\n")
             os.flush()
-            process.waitFor()
-
-            builder = CheckerUtil.readByBytes(process.inputStream)
-
-
-            val inputStream = BufferedReader(InputStreamReader(process.inputStream))
-            var line = inputStream.readLine()
+            code = process.waitFor()
+            val inputStream = if (code == SUCCESS) {
+                process.inputStream
+            } else {
+                process.errorStream
+            }
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            var line = reader.readLine()
             while (line != null) {
-                if (builder == null) {
-                    builder = StringBuilder()
-                }
                 builder.append(line + "\n")
-                line = inputStream.readLine()
+                line = reader.readLine()
             }
         } catch (e: Exception) {
             CheckerLog.e("CheckQemu", "exec error", e)
@@ -55,6 +52,6 @@ object ExecUtil {
             }
             process?.destroy()
         }
-        return builder
+        return Pair(code, builder)
     }
 }

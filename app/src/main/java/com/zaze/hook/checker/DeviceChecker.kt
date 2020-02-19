@@ -17,52 +17,40 @@ object DeviceChecker {
      * 检测安全
      */
     fun detectSafely(context: Context) {
-        var hasXposed = XposedChecker.detectByStackTrace()
-        ThreadPlugins.runInIoThread(Runnable {
-            val isEmulator = QemuChecker.detectEmulatorByProp(context)
-            if (!hasXposed) {
-                hasXposed = XposedChecker.detectByClassLoader() or XposedChecker.detectByMaps()
+        val messageBuilder = StringBuilder()
+        //
+        val xposedChecker = XposedChecker().apply {
+            this.detectByStackTrace()
+        }
+
+        ThreadPlugins.runInWorkThread(Runnable {
+            if (!xposedChecker.result.isError()) {
+                xposedChecker.detectByClassLoader()
+                xposedChecker.detectByMaps()
             }
-            val isRoot = RootChecker.detectRoot()
-//            if (isEmulator) {
-//                CheckerLog.e(TAG, "程序运行在模拟器中!")
-//            } else {
-//                CheckerLog.i(TAG, "程序运行在真实设备中!")
-//            }
-            CheckerLog.log(TAG, "isEmulator : $isEmulator", isEmulator)
-            CheckerLog.log(TAG, "isRoot : $isRoot", isRoot)
-            CheckerLog.log(TAG, "hasXposed : $hasXposed", hasXposed)
+            val qemuChecker = QemuChecker().apply {
+                detectEmulator()
+            }
+
+            val rootChecker = RootChecker().apply {
+                detectRoot()
+            }
+
+            messageBuilder.append(qemuChecker.result.messageBuilder)
+            messageBuilder.append(rootChecker.result.messageBuilder)
+            messageBuilder.append(xposedChecker.result.messageBuilder)
+
+            log("Emulator", qemuChecker.result.isError())
+            log("Root", rootChecker.result.isError())
+            log("Xposed", xposedChecker.result.isError())
+
+            CheckerLog.log(TAG, "messageBuilder $messageBuilder", true)
+            CheckerLog.log(TAG, "All Prop ${qemuChecker.getAllProp()}", true)
         })
     }
 
-//    public static boolean CheckRootPathSU()
-//    {
-//        File f=null;
-//        final String kSuSearchPaths[] = {"/system/bin/", "/system/xbin/", "/system/sbin/", "/sbin/","/vendor/bin/"};
-//        try{
-//            for(int i=0;i<kSuSearchPaths.length;i++)
-//            {
-//                f=new File(kSuSearchPaths[i]+"su");
-//                if(f!=null&&f.exists())
-//                {
-//                    return true;
-//
-//                }
-//            }catch(Exception e)
-//            {
-//                e.printStackTrace();
-//            }
-//            return false;
-//        }
 
-//    fun checkRootWhichSU(): Boolean {
-//        val strCmd = arrayOf("/system/xbin/which", "su")
-//        val execResult = executeCommand(strCmd)
-//        return if (execResult != null) {
-//            true
-//        } else {
-//            false
-//        }
-//    }
-
+    fun log(tag: String, bool: Boolean) {
+        CheckerLog.log(TAG, "$tag : $bool", bool)
+    }
 }
