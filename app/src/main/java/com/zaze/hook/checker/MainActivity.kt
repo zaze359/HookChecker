@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         checkDeviceBtn.setOnClickListener {
             ThreadPlugins.runInUIThread(Runnable {
-                DeviceChecker.detectSafely(this)
+                DeviceChecker.detectSafely()
             }, 0)
         }
         changedDeviceInfo.setOnClickListener {
