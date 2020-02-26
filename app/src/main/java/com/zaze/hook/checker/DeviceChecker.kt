@@ -44,7 +44,7 @@ object DeviceChecker {
             log("Emulator", qemuChecker.result.isError())
             log("Root", rootChecker.result.isError())
             log("Xposed", xposedChecker.result.isError())
-            CheckerLog.log(TAG, "messageBuilder $messageBuilder", true)
+            CheckerLog.log(TAG, messageBuilder.toString(), true)
 //            CheckerLog.log(TAG, "All Prop ${qemuChecker.getAllProp()}", true)
         })
 

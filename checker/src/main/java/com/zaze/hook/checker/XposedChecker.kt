@@ -58,9 +58,9 @@ class XposedChecker {
                 }
             }
         }
-        CheckerLog.e(TAG, "hasXposed flag : $flag; hasZygote: $hasZygote")
+        CheckerLog.e(TAG, "hasXposed flag : $flag; hasZygote: $hasZygote >> ${stackTrace.toList()}")
         if (flag > 0) {
-            result.addError("$TAG hit detectByStackTrace: 包含了xposed的栈信息")
+            result.addError("$TAG hit detectByStackTrace: 包含了xposed的栈信息 >> ${stackTrace.toList()}")
         }
         if (!hasZygote) {
             result.addError("$TAG hit detectByStackTrace: 没有Zygote栈信息")
