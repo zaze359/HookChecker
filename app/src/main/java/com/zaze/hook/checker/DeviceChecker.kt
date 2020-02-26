@@ -32,15 +32,17 @@ object DeviceChecker {
                 detectRoot()
             }
 
-            messageBuilder.append(qemuChecker.result.messageBuilder)
-            messageBuilder.append(rootChecker.result.messageBuilder)
-            messageBuilder.append(xposedChecker.result.messageBuilder)
             val countDownLatch = CountDownLatch(1)
             ThreadPlugins.runInUIThread(Runnable {
                 xposedChecker.detectByStackTrace()
                 countDownLatch.countDown()
             })
             countDownLatch.await(5000L, TimeUnit.SECONDS)
+
+            messageBuilder.append(qemuChecker.result.messageBuilder)
+            messageBuilder.append(rootChecker.result.messageBuilder)
+            messageBuilder.append(xposedChecker.result.messageBuilder)
+
             log("Emulator", qemuChecker.result.isError())
             log("Root", rootChecker.result.isError())
             log("Xposed", xposedChecker.result.isError())
