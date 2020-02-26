@@ -18,8 +18,11 @@ class CheckResult {
 
     fun addError(message: String) {
         flags++
-        messageBuilder.append("$message \n")
+        addMessageNoError(message)
+    }
 
+    fun addMessageNoError(message: String) {
+        messageBuilder.append("$message \n")
     }
 
     fun isError(): Boolean {

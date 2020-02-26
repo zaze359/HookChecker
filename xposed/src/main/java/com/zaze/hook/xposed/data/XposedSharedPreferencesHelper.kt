@@ -21,13 +21,13 @@ object XposedSharedPreferencesHelper {
         return context.getSharedPreferences("xposed_sp", Context.MODE_PRIVATE)
     }
 
-//    fun getDeviceInfo(context: Context): DeviceInfo? {
+//    fun getCustomDeviceInfo(context: Context): DeviceInfo? {
 //        return Utils.parseJson(
 //            getSharePreferences(context).getString("deviceInfo", "{}"), DeviceInfo::class.java
 //        )
 //    }
 
-    fun getDeviceInfo(context: Context): DeviceInfo? {
+    fun getCustomDeviceInfo(context: Context): DeviceInfo? {
         var cursor: Cursor? = null
         try {
             cursor = context.contentResolver.query(
@@ -39,7 +39,7 @@ object XposedSharedPreferencesHelper {
             )
             if (cursor != null && cursor.moveToNext()) {
                 return Utils.parseJson(
-                    cursor.getString(cursor.getColumnIndex("deviceInfo")),
+                    cursor.getString(cursor.getColumnIndex("customDeviceInfo")),
                     DeviceInfo::class.java
                 )
             }
@@ -51,9 +51,8 @@ object XposedSharedPreferencesHelper {
         return null
     }
 
-
-    fun saveDeviceInfo(context: Context, deviceInfo: DeviceInfo) {
-        getSharePreferences(context).edit().putString("deviceInfo", Utils.objToJson(deviceInfo))
+    fun saveCustomDeviceInfo(context: Context, deviceInfo: DeviceInfo?) {
+        getSharePreferences(context).edit().putString("customDeviceInfo", Utils.objToJson(deviceInfo))
             .apply()
     }
 }

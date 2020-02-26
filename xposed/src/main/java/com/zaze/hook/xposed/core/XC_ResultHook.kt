@@ -11,9 +11,8 @@ import de.robv.android.xposed.XposedBridge
 class XC_ResultHook(private val result: Any) : XC_MethodHook() {
     override fun afterHookedMethod(param: MethodHookParam?) {
         if (param != null) {
-            XposedBridge.log("${param.method.declaringClass.name} ${param.method.name} : ${param.result}")
+            XposedBridge.log("${param.method.declaringClass.name} ${param.method.name} result: ${param.result}; hooked : ${result}")
             param.result = result
-            XposedBridge.log("${param.method.declaringClass.name} ${param.method.name} hooked : ${param.result}")
         }
     }
 }

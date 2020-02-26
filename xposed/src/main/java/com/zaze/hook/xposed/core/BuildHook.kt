@@ -28,15 +28,12 @@ class BuildHook internal constructor(lpparam: XC_LoadPackage.LoadPackageParam) {
                     if (param?.args == null || param.args.isEmpty()) {
                         return
                     }
-                    param.args?.forEach {
-                        XposedBridge.log("$TAG $it")
-                    }
-                    XposedBridge.log("$TAG result $${param.result}")
+                    val result = param.result
                     val stringArg = param.args?.get(0)?.toString() ?: ""
                     if (buildMap.contains(stringArg)) {
                         param.result = buildMap[stringArg]
                     }
-                    XposedBridge.log("$TAG result hooked : ${param.result}")
+                    XposedBridge.log("$TAG args:${param.args?.toList()}; result:$result; hookedResult: ${param.result}")
                 }
             })
     }

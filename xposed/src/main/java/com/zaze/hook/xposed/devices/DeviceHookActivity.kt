@@ -3,6 +3,7 @@ package com.zaze.hook.xposed.devices
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,7 +17,7 @@ import kotlinx.android.synthetic.main.device_hook_act.*
  * @version : 2019-12-13 - 16:48
  */
 class DeviceHookActivity : Activity() {
-    private val deviceInfo = DeviceInfo()
+    private var deviceInfo: DeviceInfo? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.device_hook_act)
@@ -26,13 +27,18 @@ class DeviceHookActivity : Activity() {
     }
 
     fun init() {
-        deviceInfo.copy(XposedSharedPreferencesHelper.getDeviceInfo(this))
-        hookDeviceIdEt.setText(deviceInfo.deviceId)
-        hookDeviceNameEt.setText(deviceInfo.deviceModel)
+        deviceInfo = XposedSharedPreferencesHelper.getCustomDeviceInfo(this)
+            ?: DeviceInfo(
+                DeviceUtil.getUUID(this), Build.MODEL
+            )
+        hookDeviceIdEt.setText(deviceInfo?.deviceId)
+        hookDeviceNameEt.setText(deviceInfo?.deviceModel)
         hookDeviceInfoSaveBtn.setOnClickListener {
-            deviceInfo.deviceId = hookDeviceIdEt.text.toString()
-            deviceInfo.deviceModel = hookDeviceNameEt.text.toString()
-            XposedSharedPreferencesHelper.saveDeviceInfo(this, deviceInfo)
+            deviceInfo?.copy(
+                deviceId = hookDeviceIdEt.text.toString(),
+                deviceModel = hookDeviceNameEt.text.toString()
+            )
+            XposedSharedPreferencesHelper.saveCustomDeviceInfo(this, deviceInfo)
         }
     }
 

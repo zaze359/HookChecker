@@ -42,8 +42,11 @@ class XposedChecker {
         if (Thread.currentThread().id == Process.myPid().toLong()) {
             throw IllegalThreadStateException("必须在主线程调用")
         }
-        val stackTrace = Throwable("detect Xposed").stackTrace
+        val stackTrace = Throwable("detect Xposed").apply {
+            this.printStackTrace()
+        }.stackTrace
         var hasZygote = false
+        var bottomStackIsZygote = false
         var flag = 0
         repeat(stackTrace.count()) {
             val stackStr = stackTrace[it].toString()
@@ -53,17 +56,27 @@ class XposedChecker {
             }
             if (stackStr.contains("com.android.internal.os.ZygoteInit")) {
                 hasZygote = true
-                if (stackTrace.size - 1 != it) {
-                    flag = flag or (1 shl 1)
+                if (stackTrace.size - 1 == it) {
+                    bottomStackIsZygote = true
                 }
             }
         }
-        CheckerLog.e(TAG, "hasXposed flag : $flag; hasZygote: $hasZygote >> ${stackTrace.toList()}")
-        if (flag > 0) {
-            result.addError("$TAG hit detectByStackTrace: 包含了xposed的栈信息 >> ${stackTrace.toList()}")
-        }
-        if (!hasZygote) {
-            result.addError("$TAG hit detectByStackTrace: 没有Zygote栈信息")
+        CheckerLog.e(TAG, "hasXposed flag : $flag; hasZygote: $hasZygote; bottomStackIsZygote: ${bottomStackIsZygote}")
+        result.addMessageNoError("$TAG detectByStackTrace: ${stackTrace.toList()}")
+        when {
+            flag > 0 -> {
+                result.addError("$TAG hit detectByStackTrace: 包含了xposed的栈信息 $flag")
+            }
+            !bottomStackIsZygote -> {
+                result.addError("$TAG hit detectByStackTrace: 最底下栈没有包含zygote信息 $bottomStackIsZygote")
+            }
+            !hasZygote -> {
+                result.addError("$TAG hit detectByStackTrace: 没有Zygote栈信息")
+            }
+            else -> {
+                // safe
+
+            }
         }
     }
 

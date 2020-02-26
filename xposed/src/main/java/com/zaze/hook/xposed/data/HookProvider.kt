@@ -16,7 +16,7 @@ class HookProvider : ContentProvider() {
     companion object {
         val AUTHORITY = "com.zaze.hook.xposed.provider"
         val URI_DEVICE_INFO = "content://$AUTHORITY/device/info"
-        val deviceProperties = PropertiesHelper.load(File("/sdcard/zaze/deviceInfo"))
+//        val deviceProperties = PropertiesHelper.load(File("/sdcard/zaze/deviceInfo"))
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
