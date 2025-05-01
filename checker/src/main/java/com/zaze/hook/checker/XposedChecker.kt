@@ -3,6 +3,7 @@ package com.zaze.hook.checker
 import android.os.Process
 import com.zaze.hook.checker.log.CheckerLog
 import java.io.FileInputStream
+import java.util.HashSet
 
 /**
  * Description : 检测 Xposed
@@ -50,7 +51,6 @@ class XposedChecker {
         var flag = 0
         repeat(stackTrace.count()) {
             val stackStr = stackTrace[it].toString()
-//            CheckerLog.v("XposedChecker $it", stackStr)
             if (stackStr.contains("de.robv.android.xposed")) {
                 flag = flag or 1
             }
@@ -95,8 +95,8 @@ class XposedChecker {
             }
         }
         if (hashSet.isNotEmpty()) {
+            CheckerLog.e(TAG, "has Xposed lib ${hashSet.size}")
             result.addError("$TAG hit detectByMaps: 加载了 xposed 的so 和jar")
         }
-        CheckerLog.e(TAG, "has Xposed lib ${hashSet.size}")
     }
 }
